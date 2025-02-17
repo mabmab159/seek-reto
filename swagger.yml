@@ -1,0 +1,148 @@
+openapi: 3.0.1
+info:
+  title: API Clientes reto-seek
+  version: v0
+servers:
+  - url: http://54.165.53.104:8080
+    description: Amazon EC2
+tags:
+  - name: Seek
+    description: Documentacion de API CLoud Gateway para reto de Seek
+    externalDocs:
+      description: Link GitHub
+      url: https://docs.spring.io/spring-boot/docs/current/actuator-api/html/
+paths:
+  /auth/register:
+    post:
+      tags:
+        - Autenticacion
+      summary: Endpoint para registro de usuarios
+      operationId: registrarUsuario
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Token'
+  /auth/authenticate:
+    post:
+      tags:
+        - Autenticacion
+      summary: Endpoint para generacion de token
+      operationId: autenticarUsuario
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Token'
+  /cliente/metricas:
+    get:
+      tags:
+        - Clientes
+      summary: Endpoint para obtener metricas de los clientes
+      operationId: metricasClientes
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /cliente/{esperanza}:
+    get:
+      tags:
+        - Clientes
+      summary: Endpoint para lista clientes con el calculo de la esperanza de vida
+      operationId: listarClientes
+      parameters:
+        - name: esperanza
+          in: path
+          description: Valor de esperanza para el cálculo
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Esperanza'
+  /cliente:
+    post:
+      tags:
+        - Clientes
+      summary: Endpoint para registro de clientes
+      operationId: registrarCliente
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Cliente'
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Token:
+      properties:
+        token:
+          type: string
+    Login:
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+    Cliente:
+      properties:
+        nombre:
+          type: string
+        apellido:
+          type: string
+        edad:
+          type: number
+        fechaNacimiento:
+          type: string
+          format: date
+    Metricas:
+      properties:
+        promedio:
+          type: number
+          format: decimal
+        desviacionEstandar:
+          type: number
+          format: decimal
+    Esperanza:
+      properties:
+        nombre:
+          type: string
+        apellido:
+          type: string
+        edad:
+          type: number
+        fechaNacimiento:
+          type: string
+          format: date
+        anioEsperanza:
+          type: string
+          format: date
