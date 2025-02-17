@@ -1,0 +1,24 @@
+scrape_configs:
+  - job_name: "Cliente Service"
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 1s
+    static_configs:
+      - targets: [ 'cliente-service:9010' ]
+      - labels:
+          application: 'Cliente Service Microservice'
+
+  - job_name: "Cliente Service Query"
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 1s
+    static_configs:
+      - targets: [ 'cliente-service-query:9020' ]
+      - labels:
+          application: 'Cliente Service Query Microservice'
+
+  - job_name: "CloudGateway Service"
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 1s
+    static_configs:
+      - targets: [ 'cloud-gateway:8080' ]
+      - labels:
+          application: 'CloudGateway Service Microservice'

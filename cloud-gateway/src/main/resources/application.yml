@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: cloud-gateway
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  datasource:
+    username: seek
+    password: seek
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${MYSQL:jdbc:mysql://127.0.0.1:3306/seek}
+  flyway:
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    enabled: false
+server:
+  port: 8080
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+      base-path: /actuator
+seek:
+  security:
+    key: 87bfa122dc2c37ec2cca5a8b2e5909695072c8279cdd021267278c8f70864611c476075d5dfe954f0da07ea7823328d2d70daf7df4ac8133070bbabb0749dba6

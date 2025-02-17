@@ -1,0 +1,108 @@
+services:
+
+  mysql-service:
+    image: mysql:8.4.4
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: seek
+      MYSQL_USER: seek
+      MYSQL_PASSWORD: seek
+      MYSQL_DATABASE: seek
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-service-data:/var/lib/mysql
+    networks:
+      - seek-network
+
+  cliente-service:
+    image: cliente-service
+    build:
+      context: ./cliente-service
+      dockerfile: Dockerfile
+    depends_on:
+      - mysql-service
+    networks:
+      - seek-network
+    environment:
+      - MYSQL=jdbc:mysql://mysql-service:3306/seek
+    ports:
+      - "9010:9010"
+
+  cliente-query-service:
+    image: cliente-query-service
+    build:
+      context: ./cliente-query-service
+      dockerfile: Dockerfile
+    depends_on:
+      - mysql-service
+    networks:
+      - seek-network
+    environment:
+      - MYSQL=jdbc:mysql://mysql-service:3306/seek
+    ports:
+      - "9020:9020"
+
+  cloud-gateway:
+    image: cloud-gateway
+    build:
+      context: ./cloud-gateway
+      dockerfile: Dockerfile
+    depends_on:
+      - mysql-service
+    networks:
+      - seek-network
+    environment:
+      - MYSQL=jdbc:mysql://mysql-service:3306/seek
+    ports:
+      - "8080:8080"
+
+  zipkin:
+    image: ghcr.io/openzipkin/zipkin-slim
+    container_name: seek-zipkin
+    environment:
+      - STORAGE_TYPE=mem
+    ports:
+      - 9411:9411
+    networks:
+      - seek-network
+
+  prometheus:
+    image: prom/prometheus
+    container_name: seek-prometheus
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus/config/:/etc/prometheus/
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    networks:
+      - seek-network
+
+  grafana:
+    image: grafana/grafana-oss
+    container_name: seek-grafana
+    ports:
+      - 3000:3000
+    volumes:
+      - ./grafana/:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SERVER_DOMAIN=localhost
+    networks:
+      - seek-network
+
+  loki:
+    image: grafana/loki
+    container_name: seek-loki
+    ports:
+      - 3100:3100
+    networks:
+      - seek-network
+
+volumes:
+  mysql-service-data:
+
+
+networks:
+  seek-network:
